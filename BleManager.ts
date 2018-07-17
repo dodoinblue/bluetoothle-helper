@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { BluetoothLeHelper } from 'ionic-native-bluetoothle'
+import { BluetoothLeHelper } from './BluetoothLeHelper'
 import { BehaviorSubject, Observable, Subject } from 'rxjs'
 import { ScanResult } from './models/BleModels'
 import { Deferred } from '@dodoinblue/promiseutils'

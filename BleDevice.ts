@@ -1,4 +1,4 @@
-import { BluetoothLeHelper } from 'ionic-native-bluetoothle'
+import { BluetoothLeHelper } from './BluetoothLeHelper'
 import { Observable, Subject } from 'rxjs'
 import { take } from 'rxjs/operators'
 import { Deferred, delay, timeoutPromise } from '@dodoinblue/promiseutils'
