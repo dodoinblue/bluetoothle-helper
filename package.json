@@ -1,11 +1,11 @@
 {
   "name": "@dodoinblue/ionic-bluetoothle-helper",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Helper functions for ionic-native-bluetoothle",
   "module": "index.js",
   "typings": "index.d.ts",
   "scripts": {
-    "build": "./node_modules/typescript/bin/tsc",
+    "build": "rm -rf dist && ./node_modules/typescript/bin/tsc && cp package.json dist/. && cp README.md dist/.",
     "lint": "./node_modules/tslint/bin/tslint -p tsconfig.json",
     "lint:fix": "./node_modules/tslint/bin/tslint --fix -p tsconfig.json",
     "test": "echo \"Error: no test specified\" && exit 1"
