@@ -1,0 +1,20 @@
+{
+  "name": "@dodoinblue/ionic-bluetoothle-helper",
+  "version": "0.0.1",
+  "description": "Helper functions for ionic-native-bluetoothle",
+  "module": "index.js",
+  "typings": "index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "peerDependencies": {
+    "@ionic-native/core": "^4.2.0",
+    "@angular/core": "*",
+    "rxjs": "^5.0.1",
+    "@dodoinblue/promiseutils": "^0.1.0",
+    "ionic-native-bluetoothle": "^0.2.0"
+  },
+  "keywords": [],
+  "author": "Charles Liu <dodoinblue@gmail.com>",
+  "license": "MIT"
+}
