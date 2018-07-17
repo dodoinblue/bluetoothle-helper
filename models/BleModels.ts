@@ -1,5 +1,5 @@
 export class ScanResult {
-  constructor(
+  constructor (
     public address: string,
     public name: string,
     public advertisement: any,

@@ -20,13 +20,13 @@ export class BleDevice {
   name: string
   stateChangeSubject: Subject<{ oldState: DeviceState, newState: DeviceState }>
 
-  constructor(protected ble: BluetoothLeHelper, readonly address: string, name: string) {
+  constructor (protected ble: BluetoothLeHelper, readonly address: string, name: string) {
     this.name = name
     this.stateChangeSubject = new Subject<{ oldState: DeviceState, newState: DeviceState }>()
   }
 
   // Section - Connection
-  connect(): Promise<BleDevice> {
+  connect (): Promise<BleDevice> {
     const deferred = new Deferred<BleDevice>()
     this.setState(DeviceState.CONNECTING)
     const cancelConnectionTask = setTimeout(() => {
@@ -44,7 +44,7 @@ export class BleDevice {
     return timeoutPromise(deferred.promise, DEFAULT_CONNECTION_TIMEOUT + 1000)
   }
 
-  private kickOffConnect() {
+  private kickOffConnect () {
     this.ble.connect(this.address).subscribe(state => {
       this.name = state.name
       if (state.status === 'connected') {
@@ -65,19 +65,19 @@ export class BleDevice {
     })
   }
 
-  disconnect() {
+  disconnect () {
     return this.ble.disconnect(this.address).then(result => {
       this.setState(DeviceState.DISCONNECTED)
     })
   }
 
-  close() {
+  close () {
     this.ble.close(this.address).then(result => {
       this.setState(DeviceState.CLOSED)
     })
   }
 
-  private setState(newState: DeviceState) {
+  private setState (newState: DeviceState) {
     if (newState === DeviceState.CONNECTING) {
       // set state. that's it.
       this.state = newState
@@ -154,25 +154,25 @@ export class BleDevice {
     }
   }
 
-  isConnected(): Promise<boolean> {
+  isConnected (): Promise<boolean> {
     return this.ble.isConnected(this.address)
   }
 
-  wasConnected(): Promise<boolean> {
+  wasConnected (): Promise<boolean> {
     return this.ble.wasConnected(this.address)
   }
 
-  bond(): Promise<boolean> {
+  bond (): Promise<boolean> {
     return this.ble.bond(this.address)
   }
 
-  isBonded(): Promise<boolean> {
+  isBonded (): Promise<boolean> {
     return this.ble.isBonded(this.address)
   }
 
   // End of section - Connection
 
-  discover() {
+  discover () {
     return delay(1500).then(() => {
       return this.ble.discover(this.address)
     }).then((result) => {
@@ -181,7 +181,7 @@ export class BleDevice {
     })
   }
 
-  hasService(serviceUUID: string): boolean {
+  hasService (serviceUUID: string): boolean {
     if (!this.services) {
       return false
     }
@@ -199,22 +199,22 @@ export class BleDevice {
   //   return true
   // }
 
-  read(service: string, characteristic: string): Promise<Uint8Array> {
+  read (service: string, characteristic: string): Promise<Uint8Array> {
     return this.ble.read(this.address, service, characteristic)
   }
 
-  write(service: string, characteristic: string, cmd: Uint8Array): Promise<boolean> {
+  write (service: string, characteristic: string, cmd: Uint8Array): Promise<boolean> {
     return this.ble.write(this.address, service, characteristic, cmd, true)
   }
 
-  writeWithoutResponse(service: string, characteristic: string, cmd: Uint8Array): Promise<boolean> {
+  writeWithoutResponse (service: string, characteristic: string, cmd: Uint8Array): Promise<boolean> {
     return this.ble.write(this.address, service, characteristic, cmd, false)
   }
 
   // Section - BLE Subscriptions
   subscriptionMap: Map<string, Observable<any>> = new Map()
 
-  startNotification(service: string, characteristic: string): Observable<Uint8Array> {
+  startNotification (service: string, characteristic: string): Observable<Uint8Array> {
     console.log(`[BleDevice] startNotification from char: ${characteristic} `)
     let observable: Observable<Uint8Array> = this.subscriptionMap.get(`${characteristic}@${service}`)
     if (!observable) {
@@ -231,7 +231,7 @@ export class BleDevice {
     return observable
   }
 
-  stopNotification(service: string, characteristic: string): Promise<boolean> {
+  stopNotification (service: string, characteristic: string): Promise<boolean> {
     return this.ble.unsubscribe(this.address, service, characteristic).then(() => {
       this.subscriptionMap.delete(`${characteristic}@${service}`)
     }).then(() => Promise.resolve(true))
@@ -239,7 +239,7 @@ export class BleDevice {
 
   // End of Subscriptions
 
-  writeForData(service: string, characteristic: string, cmd: Uint8Array, writeWithoutResponse = false): Promise<Uint8Array> {
+  writeForData (service: string, characteristic: string, cmd: Uint8Array, writeWithoutResponse = false): Promise<Uint8Array> {
     const notifyPromise = this.startNotification(service, characteristic).pipe(take(1)).toPromise()
     const writePromise = this.ble.write(this.address, service, characteristic, cmd, writeWithoutResponse)
     return Promise.all([notifyPromise, writePromise]).then(resolved => resolved[0])

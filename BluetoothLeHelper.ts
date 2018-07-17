@@ -33,7 +33,7 @@ const DEFAULT_OPERATION_TIMEOUT = 5000 // ms
 export class BluetoothLeHelper {
 
   bluetoothle: BluetoothLe
-  constructor() {
+  constructor () {
     this.bluetoothle = new BluetoothLe()
   }
 
@@ -43,7 +43,7 @@ export class BluetoothLeHelper {
    *
    * @returns Promise<true> when operation is successful
    */
-  initialize(): Promise<boolean> {
+  initialize (): Promise<boolean> {
     return this.bluetoothle.initialize().pipe(
       take(1),
       map(result => result.status === 'enabled')
@@ -57,7 +57,7 @@ export class BluetoothLeHelper {
    *
    * @returns void This is synchronize method
    */
-  enable(): void {
+  enable (): void {
     this.bluetoothle.enable()
   }
 
@@ -68,7 +68,7 @@ export class BluetoothLeHelper {
    *
    * @returns void This is synchronize method
    */
-  disable(): void {
+  disable (): void {
     this.bluetoothle.disable()
   }
 
@@ -79,7 +79,7 @@ export class BluetoothLeHelper {
    *
    * @returns a json object containing information of isInitialized, isEnabled, isScanning, isDiscoverable
    */
-  getAdaptorInfo(): Promise<{
+  getAdaptorInfo (): Promise<{
     name: string
     address: string
     isInitialized: boolean
@@ -102,7 +102,7 @@ export class BluetoothLeHelper {
    * @param services - list of uuids of services to look for
    * @returns An observable of a stream of {@link ./models/BleModels | ScanResult}s
    */
-  startScan(services: string[]): Observable<ScanResult> {
+  startScan (services: string[]): Observable<ScanResult> {
     const scanParams = { 'services': services }
     return this.bluetoothle.startScan(scanParams).pipe(
       filter(result => result && result.status === 'scanResult'),
@@ -123,7 +123,7 @@ export class BluetoothLeHelper {
    *
    * @returns Promise<true> when operation is successful
    */
-  stopScan(): Promise<boolean> {
+  stopScan (): Promise<boolean> {
     return this.bluetoothle.stopScan().then(result => result.status === 'scanStopped')
   }
 
@@ -133,7 +133,7 @@ export class BluetoothLeHelper {
    * @param services - list of uuids of services to look for
    * @returns a json object with device's name and address
    */
-  retrieveConnected(services: string[]): Promise<{
+  retrieveConnected (services: string[]): Promise<{
     name: string,
     address: string
   }[]> {
@@ -149,7 +149,7 @@ export class BluetoothLeHelper {
    * @param address address of the device
    * @returns Promise<true> if the operation is successful
    */
-  bond(address: string): Promise<boolean> {
+  bond (address: string): Promise<boolean> {
     return timeoutPromiseWithError(this.bluetoothle.bond({ 'address': address }).pipe(
       filter(result => result.status === 'bonded'),
       take(1)
@@ -162,7 +162,7 @@ export class BluetoothLeHelper {
    *
    * @returns Promise<true> if the operation is successful
    */
-  unbond(address: string): Promise<boolean> {
+  unbond (address: string): Promise<boolean> {
     return timeoutPromiseWithError(this.bluetoothle.unbond({ 'address': address }).pipe(
       filter(result => result.status === 'unbonded'),
       take(1)
@@ -177,7 +177,7 @@ export class BluetoothLeHelper {
    * @param address address of the device to connect to
    * @return observable of connection status changes
    */
-  connect(address: string): Observable<IConnectionStatus> {
+  connect (address: string): Observable<IConnectionStatus> {
     return this.bluetoothle.connect({ 'address': address })
   }
 
@@ -190,7 +190,7 @@ export class BluetoothLeHelper {
    * @param address address of the device to reconnect to
    * @returns Promise<true> when operation is successful
    */
-  reconnect(address: string): Promise<boolean> {
+  reconnect (address: string): Promise<boolean> {
     return this.bluetoothle.reconnect({ 'address': address }).then(result => result.status === 'connected')
   }
 
@@ -201,7 +201,7 @@ export class BluetoothLeHelper {
    * @param address address of the device to disconnect from
    * @returns Promise<true> when operation is successful
    */
-  disconnect(address: string): Promise<boolean> {
+  disconnect (address: string): Promise<boolean> {
     return this.bluetoothle.disconnect({ 'address': address }).then(result => result.status === 'disconnected')
   }
 
@@ -212,7 +212,7 @@ export class BluetoothLeHelper {
    *
    * @param address address of the device to close
    */
-  close(address: string): Promise<boolean> {
+  close (address: string): Promise<boolean> {
     return this.bluetoothle.close({ 'address': address }).then(result => result.status === 'closed')
   }
 
@@ -225,7 +225,7 @@ export class BluetoothLeHelper {
    * @param clearCache default true
    * @returns A promise contains a json description of services and characteristics
    */
-  discover(address: string, clearCache = true): Promise<{
+  discover (address: string, clearCache = true): Promise<{
     uuid: string,
     characteristics: {
       uuid: string,
@@ -243,7 +243,7 @@ export class BluetoothLeHelper {
    * @param characteristic uuid of the characteristic to read from
    * @returns Promise of the read response in Uint8Array format
    */
-  read(address: string, service: string, characteristic: string): Promise<Uint8Array> {
+  read (address: string, service: string, characteristic: string): Promise<Uint8Array> {
     return this.bluetoothle.read({
       'address': address,
       'service': service,
@@ -262,7 +262,7 @@ export class BluetoothLeHelper {
    * @param withoutResponse false if write response is required
    * @returns Promise<true> if operation is successful
    */
-  write(address: string, service: string, characteristic: string, cmd: Uint8Array, withoutResponse: boolean): Promise<boolean> {
+  write (address: string, service: string, characteristic: string, cmd: Uint8Array, withoutResponse: boolean): Promise<boolean> {
     const writeParams = {
       'address': address,
       'service': service,
@@ -288,7 +288,7 @@ export class BluetoothLeHelper {
    * @param characteristic uuid of the characteristic to subscribe to
    * @returns Observable of Uint8Array responses returned from the device
    */
-  subscribe(address: string, service: string, characteristic: string): Observable<Uint8Array> {
+  subscribe (address: string, service: string, characteristic: string): Observable<Uint8Array> {
     return this.bluetoothle.subscribe({
       'address': address,
       'service': service,
@@ -308,7 +308,7 @@ export class BluetoothLeHelper {
    * @param characteristic uuid of the characteristic to unsubscribe from
    * @returns Promise<true> if operation is successful
    */
-  unsubscribe(address: string, service: string, characteristic: string): Promise<boolean> {
+  unsubscribe (address: string, service: string, characteristic: string): Promise<boolean> {
     return this.bluetoothle.unsubscribe({
       'address': address,
       'service': service,
@@ -322,7 +322,7 @@ export class BluetoothLeHelper {
    * @param address address of the device to read RSSI from
    * @returns Promise of the RSSI value
    */
-  rssi(address: string): Promise<number> {
+  rssi (address: string): Promise<number> {
     return this.bluetoothle.rssi({ 'address': address }).then(result => result.rssi)
   }
 
@@ -333,7 +333,7 @@ export class BluetoothLeHelper {
    * @param mtu the value of the MTU to should be set to
    * @returns Promise of an integer value mtu should be set to
    */
-  mtu(address: string, mtu: number): Promise<number> {
+  mtu (address: string, mtu: number): Promise<number> {
     return this.bluetoothle.mtu({ 'address': address, 'mtu': mtu }).then(result => result.mtu)
   }
 
@@ -345,54 +345,54 @@ export class BluetoothLeHelper {
    * @param connectionPriority choice of 'low' | 'balanced' | 'high'
    * @returns Promise<true> if operation is successful
    */
-  requestConnectionPriority(address: string, connectionPriority: 'low' | 'balanced' | 'high'): Promise<boolean> {
+  requestConnectionPriority (address: string, connectionPriority: 'low' | 'balanced' | 'high'): Promise<boolean> {
     return this.bluetoothle.requestConnectionPriority({
       'address': address,
       'connectionPriority': connectionPriority
     }).then(result => result.status === 'connectionPriorityRequested')
   }
 
-  isInitialized(): Promise<boolean> {
+  isInitialized (): Promise<boolean> {
     return this.bluetoothle.isInitialized().then(result => result.isInitialized)
   }
 
-  isEnabled(): Promise<boolean> {
+  isEnabled (): Promise<boolean> {
     return this.bluetoothle.isEnabled().then(result => result.isEnabled)
   }
 
-  isScanning(): Promise<boolean> {
+  isScanning (): Promise<boolean> {
     return this.bluetoothle.isScanning().then(result => result.isScanning)
   }
 
-  isBonded(address: string): Promise<boolean> {
+  isBonded (address: string): Promise<boolean> {
     return this.bluetoothle.isBonded({ 'address': address }).then(result => result.isBonded)
   }
 
-  wasConnected(address: string): Promise<boolean> {
+  wasConnected (address: string): Promise<boolean> {
     return this.bluetoothle.wasConnected({ 'address': address }).then(result => result.wasConnected)
   }
 
-  isConnected(address: string): Promise<boolean> {
+  isConnected (address: string): Promise<boolean> {
     return this.bluetoothle.isConnected({ 'address': address }).then(result => result.isConnected)
   }
 
-  isDiscovered(address: string): Promise<boolean> {
+  isDiscovered (address: string): Promise<boolean> {
     return this.bluetoothle.isDiscovered({ 'address': address }).then(result => result.isDiscovered)
   }
 
-  hasPermission(): Promise<boolean> {
+  hasPermission (): Promise<boolean> {
     return this.bluetoothle.hasPermission().then(result => result.hasPermission)
   }
 
-  requestPermission(): Promise<boolean> {
+  requestPermission (): Promise<boolean> {
     return this.bluetoothle.requestPermission().then(result => result.requestPermission)
   }
 
-  isLocationEnabled(): Promise<boolean> {
+  isLocationEnabled (): Promise<boolean> {
     return this.bluetoothle.isLocationEnabled().then(result => result.isLocationEnabled)
   }
 
-  requestLocation(): Promise<boolean> {
+  requestLocation (): Promise<boolean> {
     return this.bluetoothle.requestLocation().then(result => result.requestLocation)
   }
 
@@ -402,7 +402,7 @@ export class BluetoothLeHelper {
    * @param bytes Uint8Array to encode
    * @returns encoded string
    */
-  bytesToEncodedString(bytes: Uint8Array): string {
+  bytesToEncodedString (bytes: Uint8Array): string {
     return this.bluetoothle.bytesToEncodedString(bytes)
   }
 
@@ -412,7 +412,7 @@ export class BluetoothLeHelper {
    * @param s string to decode
    * @returns decoded content in Uint8Array format
    */
-  encodedStringToBytes(s: string): Uint8Array {
+  encodedStringToBytes (s: string): Uint8Array {
     return this.bluetoothle.encodedStringToBytes(s)
   }
 }
