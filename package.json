@@ -5,6 +5,9 @@
   "module": "index.js",
   "typings": "index.d.ts",
   "scripts": {
+    "build": "./node_modules/typescript/bin/tsc",
+    "lint": "./node_modules/tslint/bin/tslint -p tsconfig.json",
+    "lint:fix": "./node_modules/tslint/bin/tslint --fix -p tsconfig.json",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "peerDependencies": {
@@ -16,5 +19,18 @@
   },
   "keywords": [],
   "author": "Charles Liu <dodoinblue@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "tslint": "^5.11.0",
+    "tslint-config-standard": "^7.1.0",
+    "tslint-ionic-rules": "0.0.16",
+    "typescript": "^2.6.2"
+  },
+  "dependencies": {
+    "@angular/core": "^6.0.9",
+    "@dodoinblue/promiseutils": "^0.1.0",
+    "@ionic-native/core": "^4.9.2",
+    "ionic-native-bluetoothle": "^0.2.0",
+    "rxjs": "^5.5.11"
+  }
 }
