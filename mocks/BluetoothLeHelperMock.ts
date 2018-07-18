@@ -4,7 +4,7 @@ import { interval } from 'rxjs/observable/interval'
 import { IConnectionStatus, ConnectStatus } from 'ionic-native-bluetoothle'
 import { Observable, Observer } from 'rxjs'
 
-export class McBluetoothLeMock extends BluetoothLeHelper {
+export class BluetoothLeHelperMock extends BluetoothLeHelper {
 
   initialize (): Promise<boolean> {
     return Promise.resolve(true)
