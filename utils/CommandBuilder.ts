@@ -11,12 +11,7 @@ export class CommandBuilder {
   }
 
   appendUint8 (uint8: number): this {
-    let ab = new ArrayBuffer(2)
-    let dv = new DataView(ab)
-    dv.setUint8(0, uint8)
-    let ua = new Uint8Array(ab)
-    let bytes = Array.from(ua)
-    this.appendBytes(bytes)
+    this.appendBytes([uint8])
     return this
   }
 
