@@ -1,6 +1,6 @@
 {
   "name": "@dodoinblue/ionic-bluetoothle-helper",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Helper functions for ionic-native-bluetoothle",
   "module": "index.js",
   "typings": "index.d.ts",
@@ -8,7 +8,7 @@
     "build": "rm -rf dist && ./node_modules/typescript/bin/tsc && cp package.json dist/. && cp README.md dist/.",
     "lint": "./node_modules/tslint/bin/tslint -p tsconfig.json",
     "lint:fix": "./node_modules/tslint/bin/tslint --fix -p tsconfig.json",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "./node_modules/mocha/bin/mocha dist/tests/*.spec.js --reporter spec"
   },
   "peerDependencies": {
     "@ionic-native/core": "^4.2.0",
@@ -21,6 +21,10 @@
   "author": "Charles Liu <dodoinblue@gmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "@types/chai": "^4.1.4",
+    "@types/mocha": "^5.2.5",
+    "chai": "^4.1.2",
+    "mocha": "^5.2.0",
     "tslint": "^5.11.0",
     "tslint-config-standard": "^7.1.0",
     "tslint-ionic-rules": "0.0.16",
