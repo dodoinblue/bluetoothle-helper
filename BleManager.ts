@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core'
 import { BluetoothLeHelper } from './BluetoothLeHelper'
 import { BehaviorSubject, Observable, Subject } from 'rxjs'
 import { ScanResult } from './models/BleModels'
-import { Deferred } from '@dodoinblue/promiseutils'
+import { Deferred, timeoutPromise } from '@dodoinblue/promiseutils'
 import { BleDevice } from './BleDevice'
 
 @Injectable()
@@ -47,7 +47,6 @@ export class BleManager {
 
   scanSpecificTarget (searchRule: (result: ScanResult) => boolean, timeoutSeconds = 10): Promise<ScanResult> {
     const deferred = new Deferred<ScanResult>()
-    // TODO: Maybe I should handle the timeout manually here
     const subscription = this.scanWithTimeout(timeoutSeconds).subscribe(result => {
       if (searchRule(result)) {
         this.ble.stopScan().then(() => {
@@ -56,7 +55,11 @@ export class BleManager {
         })
       }
     })
-    return deferred.promise
+    return timeoutPromise(deferred.promise, timeoutSeconds * 1000)
+  }
+
+  stopScan (): Promise<any> {
+    return this.ble.stopScan()
   }
 
   // Section - Connection

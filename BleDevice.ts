@@ -204,11 +204,11 @@ export class BleDevice {
   }
 
   write (service: string, characteristic: string, cmd: Uint8Array): Promise<boolean> {
-    return this.ble.write(this.address, service, characteristic, cmd, true)
+    return this.ble.write(this.address, service, characteristic, cmd, false)
   }
 
   writeWithoutResponse (service: string, characteristic: string, cmd: Uint8Array): Promise<boolean> {
-    return this.ble.write(this.address, service, characteristic, cmd, false)
+    return this.ble.write(this.address, service, characteristic, cmd, true)
   }
 
   // Section - BLE Subscriptions
