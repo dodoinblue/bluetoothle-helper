@@ -11,11 +11,11 @@
     "test": "./node_modules/mocha/bin/mocha dist/tests/*.spec.js --reporter spec"
   },
   "peerDependencies": {
-    "@ionic-native/core": "^4.2.0",
+    "@ionic-native/core": "^4.5.3",
     "@angular/core": "*",
-    "rxjs": "^5.0.1",
+    "rxjs": "^5.5.7",
     "@dodoinblue/promiseutils": "^0.1.0",
-    "ionic-native-bluetoothle": "^0.2.0"
+    "ionic-native-bluetoothle": "^0.2.1"
   },
   "keywords": [],
   "author": "Charles Liu <dodoinblue@gmail.com>",
