@@ -1,6 +1,6 @@
 {
   "name": "@dodoinblue/ionic-bluetoothle-helper",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "Helper functions for ionic-native-bluetoothle",
   "module": "index.js",
   "typings": "index.d.ts",
