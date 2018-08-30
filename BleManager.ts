@@ -104,6 +104,25 @@ export class BleManager {
     })
   }
 
+  connectByDevice (device: BleDevice): Promise<BleDevice> {
+    const retrieved = this.connectedDevices.get(device.address)
+    if (retrieved) {
+      console.log('returning an already connected device.')
+      return Promise.resolve(retrieved)
+    }
+
+    return device.connect().then(() => {
+      this.addConnectedDevice(device)
+      device.stateChangeSubject.subscribe(state => {
+        console.log(`[BleManager] device status change: ${JSON.stringify(state)}`)
+        if (state.newState === 'closed') {
+          this.removeConnectedDevice(device)
+        }
+      })
+      return device
+    })
+  }
+
   disconnect (address: string): Promise<boolean> {
     const device = this.connectedDevices.get(address)
     if (device) {
