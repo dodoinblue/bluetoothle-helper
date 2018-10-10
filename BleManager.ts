@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core'
 import { BluetoothLeHelper } from './BluetoothLeHelper'
-import { BehaviorSubject, Observable, Subject } from 'rxjs'
+import { BehaviorSubject, Observable } from 'rxjs'
 import { ScanResult } from './models/BleModels'
 import { Deferred, timeoutPromise } from '@dodoinblue/promiseutils'
 import { BleDevice } from './BleDevice'
+import { takeUntil, finalize, share } from 'rxjs/operators'
 
 @Injectable()
 export class BleManager {
@@ -30,19 +31,16 @@ export class BleManager {
       .then(success => success ? Promise.resolve(true) : Promise.reject(new Error('No location permission: Failed to obtain location permission')))
   }
 
+  isScanning (): Promise<boolean> {
+    return this.ble.isScanning()
+  }
+
   scanWithTimeout (seconds = 10): Observable<ScanResult> {
-    const scanResultSubject = new Subject<ScanResult>()
-    const scanSubscription = this.ble.startScan([]).subscribe(data => {
-      scanResultSubject.next(data)
-    })
-    setTimeout(() => {
-      // TODO: scan maybe canceled early by scanSpecificTarget. Do a scan status check before calling stopScan again.
-      this.ble.stopScan().then(() => {
-        scanSubscription.unsubscribe()
-        scanResultSubject.complete()
-      })
-    }, seconds * 1000)
-    return scanResultSubject.asObservable()
+    return this.ble.startScan([]).pipe(
+      takeUntil(Observable.timer(seconds * 1000)),
+      finalize(() => this.ble.stopScan().then(() => console.log('[BleManager] scanStopped'))),
+      share()
+    )
   }
 
   scanSpecificTarget (searchRule: (result: ScanResult) => boolean, timeoutSeconds = 10): Promise<ScanResult> {

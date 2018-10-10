@@ -16,15 +16,25 @@ const DEFAULT_CONNECTION_TIMEOUT = 15 * 1000
 
 export class BleDevice {
   private services: any[]
+  public deviceState: BehaviorSubject<DeviceState> = new BehaviorSubject<DeviceState>(DeviceState.NONE)
+
+  /**
+   * @deprecated
+   * Use deviceState subject instead.
+   */
   private _state: DeviceState
-  private deviceStateSubject: BehaviorSubject<DeviceState> = new BehaviorSubject<DeviceState>(DeviceState.NONE)
+
+  /* tslint:disable */
   set state (state: DeviceState) {
     this._state = state
-    this.deviceStateSubject.next(state)
+    this.deviceState.next(state)
   }
+
   get state (): DeviceState {
     return this._state
   }
+  /* tslint:enable */
+
   name: string
   stateChangeSubject: Subject<{ oldState: DeviceState, newState: DeviceState }>
 
@@ -56,7 +66,7 @@ export class BleDevice {
         this.setState(DeviceState.DISCONNECTED)
       }
     }, () => {
-      console.log(`[BleDevice] connect2() Subscription completed.`)
+      console.log(`[BleDevice] connect() Subscription completed.`)
     })
     return this
   }
@@ -227,16 +237,15 @@ export class BleDevice {
   subscriptionMap: Map<string, Observable<any>> = new Map()
 
   startNotification (service: string, characteristic: string): Observable<Uint8Array> {
-    console.log(`[BleDevice] startNotification from char: ${characteristic} `)
     let observable: Observable<Uint8Array> = this.subscriptionMap.get(`${characteristic}@${service}`)
     if (!observable) {
       const subject = new Subject<Uint8Array>()
       console.log(`[BleDevice] Creating new observable for ${characteristic}@${service}`)
       this.ble.subscribe(this.address, service, characteristic).subscribe(result => {
         subject.next(result)
-      }, error => {
-        console.log(`[BleDevice] startNotification: ${JSON.stringify(error)}`)
-      })
+      },
+      error => console.log(`[BleDevice] error startNotification: ${JSON.stringify(error)}`))
+
       observable = subject.asObservable()
       this.subscriptionMap.set(`${characteristic}@${service}`, observable)
     }
