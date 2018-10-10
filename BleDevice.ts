@@ -1,5 +1,5 @@
 import { BluetoothLeHelper } from './BluetoothLeHelper'
-import { Observable, Subject } from 'rxjs'
+import { Observable, Subject, BehaviorSubject } from 'rxjs'
 import { take } from 'rxjs/operators'
 import { Deferred, delay, timeoutPromise } from '@dodoinblue/promiseutils'
 
@@ -16,7 +16,25 @@ const DEFAULT_CONNECTION_TIMEOUT = 15 * 1000
 
 export class BleDevice {
   private services: any[]
-  private state: DeviceState
+  public deviceState: BehaviorSubject<DeviceState> = new BehaviorSubject<DeviceState>(DeviceState.NONE)
+
+  /**
+   * @deprecated
+   * Use deviceState subject instead.
+   */
+  private _state: DeviceState
+
+  /* tslint:disable */
+  set state (state: DeviceState) {
+    this._state = state
+    this.deviceState.next(state)
+  }
+
+  get state (): DeviceState {
+    return this._state
+  }
+  /* tslint:enable */
+
   name: string
   stateChangeSubject: Subject<{ oldState: DeviceState, newState: DeviceState }>
 
@@ -27,24 +45,11 @@ export class BleDevice {
 
   // Section - Connection
   connect (): Promise<BleDevice> {
-    const deferred = new Deferred<BleDevice>()
-    this.setState(DeviceState.CONNECTING)
-    const cancelConnectionTask = setTimeout(() => {
-      this.setState(DeviceState.DISCONNECTED)
-    }, DEFAULT_CONNECTION_TIMEOUT)
-    this.stateChangeSubject.subscribe(data => {
-      if (data.newState === DeviceState.DISCOVERED) {
-        clearTimeout(cancelConnectionTask)
-        deferred.resolve(this)
-      } else if (data.newState === DeviceState.CLOSED) {
-        deferred.reject(new Error('Failed to establish connection'))
-      }
-    })
-    this.kickOffConnect()
-    return timeoutPromise(deferred.promise, DEFAULT_CONNECTION_TIMEOUT + 1000)
+    return this.kickOffConnect().waitForConnection()
   }
 
-  private kickOffConnect () {
+  kickOffConnect (): BleDevice {
+    this.setState(DeviceState.CONNECTING)
     this.ble.connect(this.address).subscribe(state => {
       this.name = state.name
       if (state.status === 'connected') {
@@ -61,8 +66,25 @@ export class BleDevice {
         this.setState(DeviceState.DISCONNECTED)
       }
     }, () => {
-      console.log(`[BleDevice] connect2() Subscription completed.`)
+      console.log(`[BleDevice] connect() Subscription completed.`)
     })
+    return this
+  }
+
+  waitForConnection (): Promise<BleDevice> {
+    const deferred = new Deferred<BleDevice>()
+    const cancelConnectionTask = setTimeout(() => {
+      this.setState(DeviceState.DISCONNECTED)
+    }, DEFAULT_CONNECTION_TIMEOUT)
+    this.stateChangeSubject.subscribe(data => {
+      if (data.newState === DeviceState.DISCOVERED) {
+        clearTimeout(cancelConnectionTask)
+        deferred.resolve(this)
+      } else if (data.newState === DeviceState.CLOSED) {
+        deferred.reject(new Error('Failed to establish connection'))
+      }
+    })
+    return timeoutPromise(deferred.promise, DEFAULT_CONNECTION_TIMEOUT + 1000)
   }
 
   disconnect () {
@@ -215,16 +237,15 @@ export class BleDevice {
   subscriptionMap: Map<string, Observable<any>> = new Map()
 
   startNotification (service: string, characteristic: string): Observable<Uint8Array> {
-    console.log(`[BleDevice] startNotification from char: ${characteristic} `)
     let observable: Observable<Uint8Array> = this.subscriptionMap.get(`${characteristic}@${service}`)
     if (!observable) {
       const subject = new Subject<Uint8Array>()
       console.log(`[BleDevice] Creating new observable for ${characteristic}@${service}`)
       this.ble.subscribe(this.address, service, characteristic).subscribe(result => {
         subject.next(result)
-      }, error => {
-        console.log(`[BleDevice] startNotification: ${JSON.stringify(error)}`)
-      })
+      },
+      error => console.log(`[BleDevice] error startNotification: ${JSON.stringify(error)}`))
+
       observable = subject.asObservable()
       this.subscriptionMap.set(`${characteristic}@${service}`, observable)
     }
